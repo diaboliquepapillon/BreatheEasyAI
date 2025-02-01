@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-const Earth3D = () => {
+export const Earth3D = () => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,5 +70,3 @@ const Earth3D = () => {
 
   return <div ref={mountRef} className="w-full h-[400px] rounded-lg overflow-hidden" />;
 };
-
-export default Earth3D;
