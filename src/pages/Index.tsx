@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AQIDisplay } from "@/components/AQIDisplay";
 import { PollutantsDisplay } from "@/components/PollutantsDisplay";
 import { TrendChart } from "@/components/TrendChart";
+import { Earth3D } from "@/components/Earth3D";
 import { getAirQuality, AirQualityData } from "@/services/airQualityService";
 import { toast } from "sonner";
 
@@ -66,9 +67,13 @@ const Index = () => {
     <div className="container py-8 space-y-6">
       <h1 className="text-3xl font-bold text-center mb-8">Air Quality Monitor</h1>
       
-      <AQIDisplay data={data} />
-      
-      <PollutantsDisplay data={data} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <AQIDisplay data={data} />
+          <PollutantsDisplay data={data} />
+        </div>
+        <Earth3D />
+      </div>
       
       <TrendChart data={trendData} />
     </div>
