@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AQIDisplay } from "@/components/AQIDisplay";
 import { PollutantsDisplay } from "@/components/PollutantsDisplay";
 import { TrendChart } from "@/components/TrendChart";
+import { AQIMap } from "@/components/AQIMap";
 import { Earth3D } from "@/components/Earth3D";
 import { getAirQuality, AirQualityData } from "@/services/airQualityService";
 import { toast } from "sonner";
@@ -45,7 +46,7 @@ const Index = () => {
     );
   }
 
-  if (error || !data) {
+  if (error || !data || !location) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -68,11 +69,14 @@ const Index = () => {
       <h1 className="text-3xl font-bold text-center mb-8">Air Quality Monitor</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
+        <div className="space-y-6">
           <AQIDisplay data={data} />
           <PollutantsDisplay data={data} />
         </div>
-        <Earth3D />
+        <div className="space-y-6">
+          <AQIMap data={data} location={location} />
+          <Earth3D />
+        </div>
       </div>
       
       <TrendChart data={trendData} />
