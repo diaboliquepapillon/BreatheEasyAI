@@ -27,7 +27,8 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
     });
 
     // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    const navControl = new mapboxgl.NavigationControl();
+    map.current.addControl(navControl, 'top-right');
 
     // Add marker for AQI data
     const el = document.createElement('div');
@@ -52,8 +53,15 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
       )
       .addTo(map.current);
 
+    // Cleanup function
     return () => {
-      map.current?.remove();
+      if (marker.current) {
+        marker.current.remove();
+      }
+      if (map.current) {
+        map.current.removeControl(navControl);
+        map.current.remove();
+      }
     };
   }, [location, data]);
 
