@@ -13,13 +13,17 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-  const initializeMap = () => {
-    if (!mapContainer.current || !mapboxToken) return;
+  useEffect(() => {
+    if (!mapContainer.current || !mapboxToken) {
+      console.error('Map container or token not available:', { container: !!mapContainer.current, hasToken: !!mapboxToken });
+      return;
+    }
 
     try {
       mapboxgl.accessToken = mapboxToken;
+      console.log('Initializing map with token:', mapboxToken);
       
       // Safely remove existing map instance if it exists
       if (map.current) {
@@ -113,33 +117,6 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
       console.error('Error initializing map:', error);
       toast.error('Failed to initialize map. Please check your Mapbox token.');
     }
-  };
-
-  useEffect(() => {
-    if (mapboxToken) {
-      initializeMap();
-    }
-
-    return () => {
-      // Safely cleanup map and marker instances
-      if (marker.current) {
-        try {
-          marker.current.remove();
-          marker.current = null;
-        } catch (error) {
-          console.error('Error removing marker:', error);
-        }
-      }
-      
-      if (map.current) {
-        try {
-          map.current.remove();
-          map.current = null;
-        } catch (error) {
-          console.error('Error removing map:', error);
-        }
-      }
-    };
   }, [location, data, mapboxToken]);
 
   const getAQIColor = (aqi: number): string => {
