@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 // OpenCage API key - in a real application, this should be stored securely
-const OPENCAGE_API_KEY = "YOUR_OPENCAGE_API_KEY";
+const OPENCAGE_API_KEY = 709b395c9ae54afe835f5a037f84967b;
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
