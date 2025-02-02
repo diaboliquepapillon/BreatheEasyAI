@@ -12,12 +12,14 @@ export interface AirQualityData {
 
 export const getAirQuality = async (lat: number, lon: number): Promise<AirQualityData> => {
   try {
+    // Using the actual coordinates for the API call
     const response = await fetch(
       `https://api.waqi.info/feed/geo:${lat};${lon}/?token=demo`
     );
     const data = await response.json();
 
     if (data.status === "ok") {
+      // Properly extract values from the API response
       return {
         aqi: data.data.aqi,
         pm25: data.data.iaqi.pm25?.v || 0,
@@ -28,7 +30,7 @@ export const getAirQuality = async (lat: number, lon: number): Promise<AirQualit
         timestamp: data.data.time.iso,
       };
     } else {
-      throw new Error("Failed to fetch air quality data");
+      throw new Error(data.data || "Failed to fetch air quality data");
     }
   } catch (error) {
     toast.error("Couldn't get air quality data for this location");
@@ -44,37 +46,37 @@ export const getAQICategory = (aqi: number): {
   if (aqi <= 50) {
     return {
       label: "Good",
-      color: "bg-green-500",
+      color: "text-green-500",
       description: "Perfect for outdoor activities! 🌳",
     };
   } else if (aqi <= 100) {
     return {
       label: "Moderate",
-      color: "bg-yellow-500",
+      color: "text-yellow-500",
       description: "OK for most people to be outside 👌",
     };
   } else if (aqi <= 150) {
     return {
       label: "Unhealthy for Sensitive Groups",
-      color: "bg-orange-500",
+      color: "text-orange-500",
       description: "Take it easy if you're sensitive to air quality 🤔",
     };
   } else if (aqi <= 200) {
     return {
       label: "Unhealthy",
-      color: "bg-red-500",
+      color: "text-red-500",
       description: "Maybe stay inside if you can 😷",
     };
   } else if (aqi <= 300) {
     return {
       label: "Very Unhealthy",
-      color: "bg-purple-500",
+      color: "text-purple-500",
       description: "Best to stay indoors today! ⚠️",
     };
   } else {
     return {
       label: "Hazardous",
-      color: "bg-red-900",
+      color: "text-red-900",
       description: "Definitely stay inside! 🏠",
     };
   }

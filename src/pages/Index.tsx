@@ -65,22 +65,22 @@ const Index = () => {
   });
 
   return (
-    <div className="container py-8 space-y-6">
+    <div className="container py-8 space-y-6 bg-gradient-to-b from-[#F2FCE2] to-white">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">How's the Air Quality? 🌍</h1>
-        <p className="text-gray-600">
-          Check the air quality at any location - just type it in below! 😊
+        <h1 className="text-3xl font-bold text-green-800">Breathe Easy 🌱</h1>
+        <p className="text-green-700">
+          Check your local air quality and help protect our environment! 🌍
         </p>
         
         {showApiInput && (
-          <div className="max-w-md mx-auto space-y-2">
-            <p className="text-sm text-gray-600">
+          <div className="max-w-md mx-auto space-y-2 p-4 bg-green-50 rounded-lg border border-green-200">
+            <p className="text-sm text-green-700">
               To use this app, you'll need a free OpenCage API key. Get one at{" "}
               <a 
                 href="https://opencagedata.com/users/sign_up" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
+                className="text-green-600 hover:underline"
               >
                 opencagedata.com
               </a>
@@ -91,8 +91,14 @@ const Index = () => {
                 placeholder="Enter your OpenCage API key"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
+                className="border-green-200 focus:ring-green-500"
               />
-              <Button onClick={handleApiKeySave}>Save Key</Button>
+              <Button 
+                onClick={handleApiKeySave}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Save Key
+              </Button>
             </div>
           </div>
         )}
@@ -103,22 +109,28 @@ const Index = () => {
             value={searchLocation}
             onChange={(e) => setSearchLocation(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
+            className="border-green-200 focus:ring-green-500"
           />
-          <Button onClick={handleLocationSearch}>Check Air</Button>
+          <Button 
+            onClick={handleLocationSearch}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            Check Air
+          </Button>
         </div>
       </div>
 
       {isLoading && (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Checking air quality...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-green-700">Checking air quality...</p>
         </div>
       )}
 
       {error && (
         <div className="text-center py-8">
           <p className="text-xl text-red-500">Oops! Something went wrong</p>
-          <p className="mt-2 text-gray-600">Please try searching for a different location</p>
+          <p className="mt-2 text-green-700">Please try searching for a different location</p>
         </div>
       )}
 
