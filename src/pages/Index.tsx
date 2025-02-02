@@ -110,7 +110,7 @@ const Index = () => {
             <Globe className="w-8 h-8 text-blue-600 animate-bounce" />
           </div>
           <p className="text-lg text-green-700 max-w-2xl mx-auto">
-            Hey there! 👋 Want to know how clean the air is in your area? Just type in your location below and let's find out! 🌍✨
+            Hello there! 👋 Would you like to know how clean the air is in your area? Simply type in your location below and we shall find out! 🌍✨
           </p>
         
           {showApiInput && (
@@ -120,7 +120,7 @@ const Index = () => {
                 <h2 className="text-xl font-semibold">Get Started!</h2>
               </div>
               <p className="text-sm text-green-700">
-                To use this app, you'll need a free OpenCage API key. Get one at{" "}
+                To utilise this application, you'll need a free OpenCage API key. Obtain one at{" "}
                 <a 
                   href="https://opencagedata.com/users/sign_up" 
                   target="_blank" 
@@ -151,7 +151,7 @@ const Index = () => {
           <div className="flex gap-2 max-w-md mx-auto">
             <div className="relative flex-1">
               <Input
-                placeholder="Type any location (e.g., Tokyo, New York, Paris)"
+                placeholder="Type any location (e.g., London, Manchester, Edinburgh)"
                 value={searchLocation}
                 onChange={(e) => setSearchLocation(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
@@ -177,8 +177,8 @@ const Index = () => {
 
         {error && (
           <div className="text-center py-8">
-            <p className="text-xl text-red-500">Oops! Something went wrong 😅</p>
-            <p className="mt-2 text-green-700">Try searching for a different location!</p>
+            <p className="text-xl text-red-500">Oh dear! Something's gone wrong 😅</p>
+            <p className="mt-2 text-green-700">Please try searching for a different location!</p>
           </div>
         )}
 

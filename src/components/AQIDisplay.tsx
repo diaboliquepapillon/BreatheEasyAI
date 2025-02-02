@@ -46,9 +46,9 @@ export const AQIDisplay = ({ data }: AQIDisplayProps) => {
         <div className="space-y-2">
           <Progress value={data.aqi} max={500} className={`h-3 ${color}`} />
           <div className="flex justify-between text-sm text-gray-500">
-            <span>Perfect 😊</span>
-            <span>Moderate 😐</span>
-            <span>Bad 😷</span>
+            <span>Brilliant 😊</span>
+            <span>Fair 😐</span>
+            <span>Poor 😷</span>
           </div>
         </div>
 

@@ -13,14 +13,21 @@ export const PollutantsDisplay = ({ data }: PollutantsDisplayProps) => {
       value: data.pm25, 
       icon: <Droplets className="w-6 h-6" />, 
       unit: "μg/m³",
-      description: "Tiny particles that can enter your lungs 🫁"
+      description: "Minuscule particles that can enter your lungs 🫁"
     },
     { 
       name: "PM10", 
       value: data.pm10, 
       icon: <Cloud className="w-6 h-6" />, 
       unit: "μg/m³",
-      description: "Dust and smoke particles in the air 💨"
+      description: "Dust and smoke particles in the atmosphere 💨
+</lov-search>
+
+<lov-search>
+Gas from cars and factories 🚗
+</lov-search>
+<lov-replace>
+Gas from motor vehicles and factories 🚗"
     },
     { 
       name: "NO₂", 
