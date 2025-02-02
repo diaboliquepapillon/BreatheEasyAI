@@ -13,8 +13,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const [mapboxToken, setMapboxToken] = useState(() => localStorage.getItem('mapbox_token') || '');
-  const [showTokenInput, setShowTokenInput] = useState(!localStorage.getItem('mapbox_token'));
+  const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN || '';
 
   const initializeMap = () => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -113,25 +112,11 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
     } catch (error) {
       console.error('Error initializing map:', error);
       toast.error('Failed to initialize map. Please check your Mapbox token.');
-      setShowTokenInput(true);
-      localStorage.removeItem('mapbox_token');
     }
-  };
-
-  const handleTokenSave = () => {
-    if (!mapboxToken.trim()) {
-      toast.error('Please enter a valid Mapbox token');
-      return;
-    }
-
-    localStorage.setItem('mapbox_token', mapboxToken);
-    setShowTokenInput(false);
-    toast.success('Mapbox token saved successfully!');
-    initializeMap();
   };
 
   useEffect(() => {
-    if (!showTokenInput && mapboxToken) {
+    if (mapboxToken) {
       initializeMap();
     }
 
@@ -155,7 +140,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
         }
       }
     };
-  }, [location, data, showTokenInput, mapboxToken]);
+  }, [location, data, mapboxToken]);
 
   const getAQIColor = (aqi: number): string => {
     if (aqi <= 50) return '#00E400'; // Good
@@ -177,38 +162,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
 
   return (
     <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-      {showTokenInput ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-white/90 backdrop-blur-sm">
-          <p className="text-sm text-gray-600 mb-4 text-center">
-            To use the map feature, you'll need a Mapbox token. Get one at{' '}
-            <a 
-              href="https://www.mapbox.com/account/access-tokens" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              mapbox.com
-            </a>
-          </p>
-          <div className="flex gap-2 w-full max-w-md">
-            <input
-              type="password"
-              placeholder="Enter your Mapbox token"
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={handleTokenSave}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div ref={mapContainer} className="absolute inset-0" />
-      )}
+      <div ref={mapContainer} className="absolute inset-0" />
     </div>
   );
 };
