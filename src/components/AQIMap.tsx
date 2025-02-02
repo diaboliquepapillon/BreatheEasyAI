@@ -22,6 +22,10 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
     try {
       mapboxgl.accessToken = mapboxToken;
       
+      if (map.current) {
+        map.current.remove();
+      }
+      
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
@@ -32,7 +36,6 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
         antialias: true
       });
 
-      // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
       map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
       map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
@@ -44,7 +47,6 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
       el.style.border = '3px solid white';
       el.style.transition = 'all 0.3s ease';
       
-      // Add hover effect
       el.addEventListener('mouseenter', () => {
         el.style.transform = 'scale(1.1) translate(-45%, -45%)';
       });
@@ -53,6 +55,10 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
       });
 
       // Create and add marker with popup
+      if (marker.current) {
+        marker.current.remove();
+      }
+
       marker.current = new mapboxgl.Marker(el)
         .setLngLat([location.lon, location.lat])
         .setPopup(
@@ -114,7 +120,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
   };
 
   useEffect(() => {
-    if (!showTokenInput) {
+    if (!showTokenInput && mapboxToken) {
       initializeMap();
     }
 
@@ -126,7 +132,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
         map.current.remove();
       }
     };
-  }, [location, data, showTokenInput]);
+  }, [location, data, showTokenInput, mapboxToken]);
 
   const getAQIColor = (aqi: number): string => {
     if (aqi <= 50) return '#00E400'; // Good
