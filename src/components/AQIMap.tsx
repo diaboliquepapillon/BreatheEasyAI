@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AirQualityData } from '@/services/airQualityService';
@@ -49,20 +49,18 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
       map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
       map.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
 
-      // Create fun, animated marker element
+      // Create stable marker element
       const el = document.createElement('div');
-      el.className = 'flex items-center justify-center w-16 h-16 rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1/2 animate-bounce';
+      el.className = 'flex items-center justify-center w-12 h-12 rounded-full shadow-lg transform -translate-x-1/2 -translate-y-1/2';
       el.style.backgroundColor = getAQIColor(data.aqi);
-      el.style.border = '4px solid white';
+      el.style.border = '3px solid white';
       el.style.transition = 'all 0.3s ease';
       
       el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.2) translate(-40%, -40%)';
-        el.classList.remove('animate-bounce');
+        el.style.transform = 'scale(1.1) translate(-45%, -45%)';
       });
       el.addEventListener('mouseleave', () => {
         el.style.transform = 'translate(-50%, -50%)';
-        el.classList.add('animate-bounce');
       });
 
       if (marker.current) {
@@ -176,7 +174,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
     <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
       <div ref={mapContainer} className="absolute inset-0" />
       <div className="absolute bottom-4 left-4 bg-white/90 p-3 rounded-lg shadow-lg text-sm max-w-[200px]">
-        <p className="font-medium text-gray-700">🎯 Click the bouncing marker to see detailed insights!</p>
+        <p className="font-medium text-gray-700">🎯 Click the marker to see air quality insights!</p>
       </div>
     </div>
   );
