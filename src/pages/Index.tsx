@@ -16,17 +16,42 @@ const Index = () => {
   const [showApiInput, setShowApiInput] = useState(!localStorage.getItem("opencage_api_key"));
 
   const handleApiKeySave = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem("opencage_api_key", apiKey);
-      setShowApiInput(false);
-      toast.success("API key saved! You can now search for locations.");
+    if (!apiKey.trim()) {
+      toast.error("Please enter a valid API key");
+      return;
     }
+    
+    // Test the API key with a simple query
+    fetch(`https://api.opencagedata.com/geocode/v1/json?q=London&key=${apiKey}`)
+      .then(response => {
+        if (response.status === 401) {
+          throw new Error("Invalid API key");
+        }
+        if (!response.ok) {
+          throw new Error("Failed to validate API key");
+        }
+        return response.json();
+      })
+      .then(() => {
+        localStorage.setItem("opencage_api_key", apiKey);
+        setShowApiInput(false);
+        toast.success("API key saved successfully!");
+      })
+      .catch((error) => {
+        toast.error(error.message || "Invalid API key. Please check and try again.");
+        localStorage.removeItem("opencage_api_key");
+      });
   };
 
   const handleLocationSearch = async () => {
     if (!apiKey) {
       toast.error("Please enter your OpenCage API key first");
       setShowApiInput(true);
+      return;
+    }
+
+    if (!searchLocation.trim()) {
+      toast.error("Please enter a location to search");
       return;
     }
 
