@@ -8,6 +8,7 @@ import { getAirQuality } from "@/services/airQualityService";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Rocket, Globe, Wind } from "lucide-react";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
@@ -21,7 +22,6 @@ const Index = () => {
       return;
     }
     
-    // Test the API key with a simple query
     fetch(`https://api.opencagedata.com/geocode/v1/json?q=London&key=${apiKey}`)
       .then(response => {
         if (response.status === 401) {
@@ -35,7 +35,7 @@ const Index = () => {
       .then(() => {
         localStorage.setItem("opencage_api_key", apiKey);
         setShowApiInput(false);
-        toast.success("API key saved successfully!");
+        toast.success("API key saved successfully! 🚀");
       })
       .catch((error) => {
         toast.error(error.message || "Invalid API key. Please check and try again.");
@@ -74,7 +74,7 @@ const Index = () => {
       if (data.results && data.results.length > 0) {
         const { lat, lng: lon } = data.results[0].geometry;
         setLocation({ lat, lon });
-        toast.success("Location found! Checking air quality...");
+        toast.success("Location found! Checking air quality... 🌍");
       } else {
         toast.error("Location not found. Please try again with a different search term.");
       }
@@ -91,22 +91,33 @@ const Index = () => {
   });
 
   return (
-    <div className="container py-8 space-y-6 bg-gradient-to-b from-[#F2FCE2] to-white">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-green-800">Breathe Easy 🌱</h1>
-        <p className="text-green-700">
-          Check your local air quality and help protect our environment! 🌍
-        </p>
+    <div className="min-h-screen bg-gradient-to-b from-[#F2FCE2] to-white">
+      <div className="container py-8 space-y-8">
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Wind className="w-8 h-8 text-green-600 animate-bounce" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              AirCheck Pro
+            </h1>
+            <Globe className="w-8 h-8 text-blue-600 animate-bounce" />
+          </div>
+          <p className="text-lg text-green-700 max-w-2xl mx-auto">
+            Hey there! 👋 Want to know how clean the air is in your area? Just type in your location below and let's find out! 🌍✨
+          </p>
         
         {showApiInput && (
-          <div className="max-w-md mx-auto space-y-2 p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="max-w-md mx-auto space-y-4 p-6 bg-white rounded-xl shadow-lg border-2 border-green-100 animate-fade-in">
+            <div className="flex items-center justify-center gap-2 text-green-600">
+              <Rocket className="w-6 h-6" />
+              <h2 className="text-xl font-semibold">Get Started!</h2>
+            </div>
             <p className="text-sm text-green-700">
               To use this app, you'll need a free OpenCage API key. Get one at{" "}
               <a 
                 href="https://opencagedata.com/users/sign_up" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-green-600 hover:underline"
+                className="text-blue-600 hover:underline"
               >
                 opencagedata.com
               </a>
@@ -131,7 +142,7 @@ const Index = () => {
         
         <div className="flex gap-2 max-w-md mx-auto">
           <Input
-            placeholder="Enter a location (e.g., London, New York, Tokyo)"
+            placeholder="Type any location (e.g., Tokyo, New York, Paris)"
             value={searchLocation}
             onChange={(e) => setSearchLocation(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
@@ -139,7 +150,7 @@ const Index = () => {
           />
           <Button 
             onClick={handleLocationSearch}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 transition-all hover:scale-105"
           >
             Check Air
           </Button>
@@ -149,28 +160,30 @@ const Index = () => {
       {isLoading && (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-green-700">Checking air quality...</p>
+          <p className="mt-4 text-green-700">Loading your results... 🌿</p>
         </div>
       )}
 
       {error && (
         <div className="text-center py-8">
-          <p className="text-xl text-red-500">Oops! Something went wrong</p>
-          <p className="mt-2 text-green-700">Please try searching for a different location</p>
+          <p className="text-xl text-red-500">Oops! Something went wrong 😅</p>
+          <p className="mt-2 text-green-700">Try searching for a different location!</p>
         </div>
       )}
 
       {data && location && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
           <div className="space-y-6">
             <AQIDisplay data={data} />
             <PollutantsDisplay data={data} />
           </div>
-          <div>
+          <div className="space-y-6">
             <AQIMap data={data} location={location} />
+            <TrendChart data={[data]} />
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
