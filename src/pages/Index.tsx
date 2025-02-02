@@ -39,7 +39,7 @@ const Index = () => {
       
       const data = await response.json();
       
-      if (data.status?.code === 401) {
+      if (data.status?.code === 401 || data.status?.code === 403) {
         toast.error("Invalid API key. Please check and try again.");
         setShowApiInput(true);
         localStorage.removeItem("opencage_api_key");
@@ -51,9 +51,10 @@ const Index = () => {
         setLocation({ lat, lon });
         toast.success("Location found! Checking air quality...");
       } else {
-        toast.error("Location not found. Please try again.");
+        toast.error("Location not found. Please try again with a different search term.");
       }
     } catch (error) {
+      console.error("Error searching location:", error);
       toast.error("Couldn't find this location. Please try again.");
     }
   };
