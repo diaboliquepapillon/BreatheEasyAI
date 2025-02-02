@@ -22,8 +22,13 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
     try {
       mapboxgl.accessToken = mapboxToken;
       
+      // Safely remove existing map instance if it exists
       if (map.current) {
-        map.current.remove();
+        try {
+          map.current.remove();
+        } catch (error) {
+          console.error('Error removing existing map:', error);
+        }
       }
       
       map.current = new mapboxgl.Map({
@@ -54,9 +59,13 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
         el.style.transform = 'translate(-50%, -50%)';
       });
 
-      // Create and add marker with popup
+      // Safely remove existing marker if it exists
       if (marker.current) {
-        marker.current.remove();
+        try {
+          marker.current.remove();
+        } catch (error) {
+          console.error('Error removing existing marker:', error);
+        }
       }
 
       marker.current = new mapboxgl.Marker(el)
@@ -82,13 +91,15 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
 
       // Add terrain and sky
       map.current.on('style.load', () => {
-        map.current?.setFog({
+        if (!map.current) return;
+        
+        map.current.setFog({
           color: 'rgb(186, 210, 235)',
           'high-color': 'rgb(36, 92, 223)',
           'horizon-blend': 0.02
         });
 
-        map.current?.addLayer({
+        map.current.addLayer({
           id: 'sky',
           type: 'sky',
           paint: {
@@ -125,11 +136,23 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
     }
 
     return () => {
+      // Safely cleanup map and marker instances
       if (marker.current) {
-        marker.current.remove();
+        try {
+          marker.current.remove();
+          marker.current = null;
+        } catch (error) {
+          console.error('Error removing marker:', error);
+        }
       }
+      
       if (map.current) {
-        map.current.remove();
+        try {
+          map.current.remove();
+          map.current = null;
+        } catch (error) {
+          console.error('Error removing map:', error);
+        }
       }
     };
   }, [location, data, showTokenInput, mapboxToken]);
