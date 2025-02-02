@@ -12,14 +12,15 @@ export interface AirQualityData {
 
 export const getAirQuality = async (lat: number, lon: number): Promise<AirQualityData> => {
   try {
-    // Using the actual coordinates for the API call
     const response = await fetch(
       `https://api.waqi.info/feed/geo:${lat};${lon}/?token=demo`
     );
     const data = await response.json();
 
     if (data.status === "ok") {
-      // Properly extract values from the API response
+      // Convert the timestamp to ISO string for consistent date handling
+      const timestamp = data.data.time.iso || new Date().toISOString();
+      
       return {
         aqi: data.data.aqi,
         pm25: data.data.iaqi.pm25?.v || 0,
@@ -27,7 +28,7 @@ export const getAirQuality = async (lat: number, lon: number): Promise<AirQualit
         no2: data.data.iaqi.no2?.v || 0,
         o3: data.data.iaqi.o3?.v || 0,
         co: data.data.iaqi.co?.v || 0,
-        timestamp: data.data.time.iso,
+        timestamp: timestamp,
       };
     } else {
       throw new Error(data.data || "Failed to fetch air quality data");

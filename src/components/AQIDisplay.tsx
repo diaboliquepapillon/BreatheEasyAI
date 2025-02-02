@@ -1,6 +1,7 @@
 import { AirQualityData, getAQICategory } from "@/services/airQualityService";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { format } from "date-fns";
 
 interface AQIDisplayProps {
   data: AirQualityData;
@@ -8,6 +9,7 @@ interface AQIDisplayProps {
 
 export const AQIDisplay = ({ data }: AQIDisplayProps) => {
   const { label, color, description } = getAQICategory(data.aqi);
+  const formattedDate = format(new Date(data.timestamp), "PPpp");
 
   return (
     <Card className="p-6 animate-fade-in">
@@ -15,7 +17,7 @@ export const AQIDisplay = ({ data }: AQIDisplayProps) => {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Air Quality Index</h2>
           <span className="text-sm text-gray-500">
-            Updated: {new Date(data.timestamp).toLocaleTimeString()}
+            Updated: {formattedDate}
           </span>
         </div>
         
