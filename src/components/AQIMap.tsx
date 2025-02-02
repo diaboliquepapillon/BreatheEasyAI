@@ -3,6 +3,9 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AirQualityData } from '@/services/airQualityService';
 import { toast } from 'sonner';
+const REACT_APP_MAPBOX_TOKEN= "pk.eyJ1IjoidmFoYWJvdmF5bGluIiwiYSI6ImNtNm5xaXV1YTB4eDQya3B6dnoyemJ5a2gifQ.mNr3RHGj5dSFJKxNRDb2pQ";
+
+
 
 interface AQIMapProps {
   data: AirQualityData;
