@@ -10,8 +10,9 @@ export interface AirQualityData {
   timestamp: string;
 }
 
+
 export const getAirQuality = async (lat: number, lon: number): Promise<AirQualityData> => {
-  const token = localStorage.getItem("waqi_api_key");
+  const token = localStorage.getItem('313bdd8f80305b7662663ab22e1c1d8c3e2b4871');
   
   if (!token) {
     throw new Error("Please enter your WAQI API token first");

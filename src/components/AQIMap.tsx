@@ -13,8 +13,8 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const [mapboxToken, setMapboxToken] = useState(() => localStorage.getItem('mapbox_token') || '');
-  const [showTokenInput, setShowTokenInput] = useState(!localStorage.getItem('mapbox_token'));
+  const [mapboxToken, setMapboxToken] = useState(() => localStorage.getItem(REACT_APP_MAPBOX_TOKEN) || '');
+  const [showTokenInput, setShowTokenInput] = useState(!localStorage.getItem('REACT_APP_MAPBOX_TOKEN));
 
   const initializeMap = () => {
     if (!mapContainer.current || !mapboxToken) return;
