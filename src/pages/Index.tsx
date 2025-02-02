@@ -12,15 +12,39 @@ import { Button } from "@/components/ui/button";
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("opencage_api_key") || "");
+  const [showApiInput, setShowApiInput] = useState(!localStorage.getItem("opencage_api_key"));
+
+  const handleApiKeySave = () => {
+    if (apiKey.trim()) {
+      localStorage.setItem("opencage_api_key", apiKey);
+      setShowApiInput(false);
+      toast.success("API key saved! You can now search for locations.");
+    }
+  };
 
   const handleLocationSearch = async () => {
+    if (!apiKey) {
+      toast.error("Please enter your OpenCage API key first");
+      setShowApiInput(true);
+      return;
+    }
+
     try {
       const response = await fetch(
         `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
           searchLocation
-        )}&key=YOUR_OPENCAGE_KEY`
+        )}&key=${apiKey}`
       );
+      
       const data = await response.json();
+      
+      if (data.status?.code === 401) {
+        toast.error("Invalid API key. Please check and try again.");
+        setShowApiInput(true);
+        localStorage.removeItem("opencage_api_key");
+        return;
+      }
       
       if (data.results && data.results.length > 0) {
         const { lat, lng: lon } = data.results[0].geometry;
@@ -43,10 +67,35 @@ const Index = () => {
   return (
     <div className="container py-8 space-y-6">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">How's the Air Quality?</h1>
+        <h1 className="text-3xl font-bold">How's the Air Quality? 🌍</h1>
         <p className="text-gray-600">
-          Just type in any location to check how clean the air is there! 🌍
+          Check the air quality at any location - just type it in below! 😊
         </p>
+        
+        {showApiInput && (
+          <div className="max-w-md mx-auto space-y-2">
+            <p className="text-sm text-gray-600">
+              To use this app, you'll need a free OpenCage API key. Get one at{" "}
+              <a 
+                href="https://opencagedata.com/users/sign_up" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                opencagedata.com
+              </a>
+            </p>
+            <div className="flex gap-2">
+              <Input
+                type="password"
+                placeholder="Enter your OpenCage API key"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+              />
+              <Button onClick={handleApiKeySave}>Save Key</Button>
+            </div>
+          </div>
+        )}
         
         <div className="flex gap-2 max-w-md mx-auto">
           <Input
