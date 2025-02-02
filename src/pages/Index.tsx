@@ -8,78 +8,13 @@ import { getAirQuality, getHistoricalAirQuality } from "@/services/airQualitySer
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Rocket, Globe, Wind, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("opencage_api_key") || "");
-  const [waqiApiKey, setWaqiApiKey] = useState(() => localStorage.getItem("waqi_api_key") || "");
-  const [showApiInput, setShowApiInput] = useState(!localStorage.getItem("opencage_api_key"));
-  const [showWaqiApiInput, setShowWaqiApiInput] = useState(!localStorage.getItem("waqi_api_key"));
-
-  const handleApiKeySave = () => {
-    if (!apiKey.trim()) {
-      toast.error("Please enter a valid API key");
-      return;
-    }
-    
-    fetch(`https://api.opencagedata.com/geocode/v1/json?q=London&key=${apiKey}`)
-      .then(response => {
-        if (response.status === 401) {
-          throw new Error("Invalid API key");
-        }
-        if (!response.ok) {
-          throw new Error("Failed to validate API key");
-        }
-        return response.json();
-      })
-      .then(() => {
-        localStorage.setItem("opencage_api_key", apiKey);
-        setShowApiInput(false);
-        toast.success("OpenCage API key saved successfully! 🚀");
-      })
-      .catch((error) => {
-        toast.error(error.message || "Invalid API key. Please check and try again.");
-        localStorage.removeItem("opencage_api_key");
-      });
-  };
-
-  const handleWaqiApiKeySave = () => {
-    if (!waqiApiKey.trim()) {
-      toast.error("Please enter a valid WAQI API key");
-      return;
-    }
-
-    fetch(`https://api.waqi.info/feed/here/?token=${waqiApiKey}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === "error") {
-          throw new Error("Invalid WAQI API key");
-        }
-        localStorage.setItem("waqi_api_key", waqiApiKey);
-        setShowWaqiApiInput(false);
-        toast.success("WAQI API key saved successfully! 🌍");
-      })
-      .catch((error) => {
-        toast.error(error.message || "Invalid WAQI API key. Please check and try again.");
-        localStorage.removeItem("waqi_api_key");
-      });
-  };
 
   const handleLocationSearch = async () => {
-    if (!apiKey) {
-      toast.error("Please enter your OpenCage API key first");
-      setShowApiInput(true);
-      return;
-    }
-
-    if (!waqiApiKey) {
-      toast.error("Please enter your WAQI API key first");
-      setShowWaqiApiInput(true);
-      return;
-    }
-
     if (!searchLocation.trim()) {
       toast.error("Please enter a location to search");
       return;
@@ -89,17 +24,10 @@ const Index = () => {
       const response = await fetch(
         `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
           searchLocation
-        )}&key=${apiKey}`
+        )}&key=YOUR_OPENCAGE_API_KEY`
       );
       
       const data = await response.json();
-      
-      if (data.status?.code === 401 || data.status?.code === 403) {
-        toast.error("Invalid OpenCage API key. Please check and try again.");
-        setShowApiInput(true);
-        localStorage.removeItem("opencage_api_key");
-        return;
-      }
       
       if (data.results && data.results.length > 0) {
         const { lat, lng: lon } = data.results[0].geometry;
@@ -133,6 +61,60 @@ const Index = () => {
     if (aqi <= 150) return "from-orange-100";
     return "from-red-100";
   };
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundColor(currentData?.aqi)} to-white p-4 md:p-8 space-y-6`}>
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex flex-col items-center space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            Air Quality Monitor 🌍
+          </h1>
+          <p className="text-gray-600 text-center max-w-2xl">
+            Enter a location to check real-time air quality data and get health recommendations
+          </p>
+          <div className="flex w-full max-w-md gap-2">
+            <Input
+              placeholder="Enter location (e.g., London, UK)"
+              value={searchLocation}
+              onChange={(e) => setSearchLocation(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
+            />
+            <Button onClick={handleLocationSearch}>
+              <Search className="mr-2" />
+              Search
+            </Button>
+          </div>
+        </div>
+
+        {isLoading && (
+          <div className="text-center text-gray-600">
+            Loading air quality data... ⏳
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center text-red-500">
+            Error loading air quality data. Please try again.
+          </div>
+        )}
+
+        {currentData && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AQIDisplay data={currentData} />
+            <PollutantsDisplay data={currentData} />
+          </div>
+        )}
+
+        {historicalData && historicalData.length > 0 && (
+          <TrendChart data={historicalData} />
+        )}
+
+        {location && currentData && (
+          <AQIMap data={currentData} location={location} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Index;
