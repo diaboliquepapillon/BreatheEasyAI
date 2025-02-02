@@ -3,9 +3,6 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AirQualityData } from '@/services/airQualityService';
 import { toast } from 'sonner';
-const REACT_APP_MAPBOX_TOKEN= "pk.eyJ1IjoidmFoYWJvdmF5bGluIiwiYSI6ImNtNm5xaXV1YTB4eDQya3B6dnoyemJ5a2gifQ.mNr3RHGj5dSFJKxNRDb2pQ";
-
-
 
 interface AQIMapProps {
   data: AirQualityData;
@@ -16,7 +13,7 @@ export const AQIMap = ({ data, location }: AQIMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const marker = useRef<mapboxgl.Marker | null>(null);
-  const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN || '';
+  const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN || '';
 
   const initializeMap = () => {
     if (!mapContainer.current || !mapboxToken) return;
