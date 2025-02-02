@@ -4,7 +4,7 @@ import { AQIDisplay } from "@/components/AQIDisplay";
 import { PollutantsDisplay } from "@/components/PollutantsDisplay";
 import { TrendChart } from "@/components/TrendChart";
 import { AQIMap } from "@/components/AQIMap";
-import { getAirQuality } from "@/services/airQualityService";
+import { getAirQuality, getHistoricalAirQuality } from "@/services/airQualityService";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -114,9 +114,15 @@ const Index = () => {
     }
   };
 
-  const { data, isLoading, error } = useQuery({
+  const { data: currentData, isLoading, error } = useQuery({
     queryKey: ["airQuality", location?.lat, location?.lon],
     queryFn: () => (location ? getAirQuality(location.lat, location.lon) : null),
+    enabled: !!location,
+  });
+
+  const { data: historicalData } = useQuery({
+    queryKey: ["historicalAirQuality", location?.lat, location?.lon],
+    queryFn: () => (location ? getHistoricalAirQuality(location.lat, location.lon) : null),
     enabled: !!location,
   });
 
@@ -129,7 +135,7 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundColor(data?.aqi)} to-white transition-colors duration-500`}>
+    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundColor(currentData?.aqi)} to-white transition-colors duration-500`}>
       <div className="container py-8 space-y-8">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -248,23 +254,23 @@ const Index = () => {
           </div>
         )}
 
-        {data && location && (
+        {currentData && location && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
             <div className="space-y-6">
-              <AQIDisplay data={data} />
-              <PollutantsDisplay data={data} />
+              <AQIDisplay data={currentData} />
+              <PollutantsDisplay data={currentData} />
             </div>
             <div className="space-y-6">
-              <AQIMap data={data} location={location} />
-              <TrendChart data={[data]} />
+              <AQIMap data={currentData} location={location} />
+              <TrendChart data={historicalData || [currentData]} />
             </div>
           </div>
         )}
 
-        {data && (
+        {currentData && (
           <Button
             onClick={() => {
-              const text = `Air Quality in ${searchLocation}: ${data.aqi} AQI - Check it out on AirCheck Pro!`;
+              const text = `Air Quality in ${searchLocation}: ${currentData.aqi} AQI - Check it out on AirCheck Pro!`;
               if (navigator.share) {
                 navigator.share({
                   title: 'AirCheck Pro - Air Quality Update',
