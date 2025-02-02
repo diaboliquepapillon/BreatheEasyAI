@@ -10,9 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
-// TODO: Replace with your OpenCage API key
-const OPENCAGE_API_KEY = "709b395c9ae54afe835f5a037f84967b";
-
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
@@ -66,54 +63,59 @@ const Index = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundColor(currentData?.aqi)} to-white p-4 md:p-8 space-y-6`}>
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-col items-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundColor(currentData?.aqi)} to-white p-2 md:p-8 space-y-4 md:space-y-6`}>
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-8">
+        <div className="flex flex-col items-center space-y-3 md:space-y-4">
+          <h1 className="text-3xl md:text-5xl font-bold text-center bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent px-2">
             Air Quality Monitor 🌍
           </h1>
-          <p className="text-gray-600 text-center max-w-2xl">
+          <p className="text-gray-600 text-center max-w-2xl text-sm md:text-base px-4">
             Enter a location to check real-time air quality data and get health recommendations
           </p>
-          <div className="flex w-full max-w-md gap-2">
+          <div className="flex w-full max-w-md gap-2 px-4">
             <Input
+              className="text-sm md:text-base"
               placeholder="Enter location (e.g., London, UK)"
               value={searchLocation}
               onChange={(e) => setSearchLocation(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
             />
             <Button onClick={handleLocationSearch}>
-              <Search className="mr-2" />
-              Search
+              <Search className="w-4 h-4 md:w-5 md:h-5 md:mr-2" />
+              <span className="hidden md:inline">Search</span>
             </Button>
           </div>
         </div>
 
         {isLoading && (
-          <div className="text-center text-gray-600">
+          <div className="text-center text-gray-600 text-sm md:text-base">
             Loading air quality data... ⏳
           </div>
         )}
 
         {error && (
-          <div className="text-center text-red-500">
+          <div className="text-center text-red-500 text-sm md:text-base">
             Error loading air quality data. Please try again.
           </div>
         )}
 
         {currentData && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-4 md:gap-6 px-2 md:px-0">
             <AQIDisplay data={currentData} />
             <PollutantsDisplay data={currentData} />
           </div>
         )}
 
         {historicalData && historicalData.length > 0 && (
-          <TrendChart data={historicalData} />
+          <div className="px-2 md:px-0">
+            <TrendChart data={historicalData} />
+          </div>
         )}
 
         {location && currentData && (
-          <AQIMap data={currentData} location={location} />
+          <div className="px-2 md:px-0">
+            <AQIMap data={currentData} location={location} />
+          </div>
         )}
       </div>
     </div>

@@ -8,33 +8,35 @@ interface TrendChartProps {
 
 export const TrendChart = ({ data }: TrendChartProps) => {
   return (
-    <Card className="p-6 h-[300px] animate-fade-in hover:shadow-lg transition-shadow duration-300">
-      <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+    <Card className="p-3 md:p-6 h-[250px] md:h-[300px] animate-fade-in hover:shadow-lg transition-shadow duration-300">
+      <h2 className="text-lg md:text-xl font-bold mb-2 md:mb-4 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
         Air Quality Timeline 📊
       </h2>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
+        <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
           <XAxis
             dataKey="timestamp"
             tickFormatter={(time) => new Date(time).toLocaleTimeString()}
             interval="preserveStartEnd"
             stroke="#666"
+            tick={{ fontSize: 12 }}
           />
-          <YAxis stroke="#666" />
+          <YAxis stroke="#666" tick={{ fontSize: 12 }} />
           <Tooltip
             labelFormatter={(label) => new Date(label).toLocaleTimeString()}
             contentStyle={{ 
               background: "white", 
               border: "1px solid #ddd",
               borderRadius: "8px",
-              padding: "8px"
+              padding: "8px",
+              fontSize: "12px"
             }}
           />
           <Line
             type="monotone"
             dataKey="aqi"
             stroke="url(#colorGradient)"
-            strokeWidth={3}
+            strokeWidth={2}
             dot={false}
           />
           <defs>
