@@ -1,85 +1,89 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AQIDisplay } from "@/components/AQIDisplay";
 import { PollutantsDisplay } from "@/components/PollutantsDisplay";
 import { TrendChart } from "@/components/TrendChart";
 import { AQIMap } from "@/components/AQIMap";
-import { Earth3D } from "@/components/Earth3D";
-import { getAirQuality, AirQualityData } from "@/services/airQualityService";
+import { getAirQuality } from "@/services/airQualityService";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  const [searchLocation, setSearchLocation] = useState("");
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
 
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-        },
-        () => {
-          toast.error("Could not get your location. Using default location.");
-          setLocation({ lat: 51.5074, lon: -0.1278 }); // Default to London
-        }
+  const handleLocationSearch = async () => {
+    try {
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+          searchLocation
+        )}&key=YOUR_OPENCAGE_KEY`
       );
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        const { lat, lng: lon } = data.results[0].geometry;
+        setLocation({ lat, lon });
+        toast.success("Location found! Checking air quality...");
+      } else {
+        toast.error("Location not found. Please try again.");
+      }
+    } catch (error) {
+      toast.error("Couldn't find this location. Please try again.");
     }
-  }, []);
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["airQuality", location?.lat, location?.lon],
-    queryFn: () => location ? getAirQuality(location.lat, location.lon) : null,
+    queryFn: () => (location ? getAirQuality(location.lat, location.lon) : null),
     enabled: !!location,
-    refetchInterval: 300000, // Refresh every 5 minutes
   });
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading air quality data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !data || !location) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl text-red-500">Failed to load air quality data</p>
-          <p className="mt-2 text-gray-600">Please try again later</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Mock data for the trend chart (in a real app, this would come from the API)
-  const trendData: AirQualityData[] = Array.from({ length: 24 }, (_, i) => ({
-    ...data,
-    aqi: data.aqi + Math.random() * 20 - 10,
-    timestamp: new Date(Date.now() - i * 3600000).toISOString(),
-  })).reverse();
 
   return (
     <div className="container py-8 space-y-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Air Quality Monitor</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <AQIDisplay data={data} />
-          <PollutantsDisplay data={data} />
-        </div>
-        <div className="space-y-6">
-          <AQIMap data={data} location={location} />
-          <Earth3D />
+      <div className="text-center space-y-4">
+        <h1 className="text-3xl font-bold">How's the Air Quality?</h1>
+        <p className="text-gray-600">
+          Just type in any location to check how clean the air is there! 🌍
+        </p>
+        
+        <div className="flex gap-2 max-w-md mx-auto">
+          <Input
+            placeholder="Enter a location (e.g., London, New York, Tokyo)"
+            value={searchLocation}
+            onChange={(e) => setSearchLocation(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
+          />
+          <Button onClick={handleLocationSearch}>Check Air</Button>
         </div>
       </div>
-      
-      <TrendChart data={trendData} />
+
+      {isLoading && (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking air quality...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center py-8">
+          <p className="text-xl text-red-500">Oops! Something went wrong</p>
+          <p className="mt-2 text-gray-600">Please try searching for a different location</p>
+        </div>
+      )}
+
+      {data && location && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <AQIDisplay data={data} />
+            <PollutantsDisplay data={data} />
+          </div>
+          <div>
+            <AQIMap data={data} location={location} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

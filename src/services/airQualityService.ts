@@ -31,7 +31,7 @@ export const getAirQuality = async (lat: number, lon: number): Promise<AirQualit
       throw new Error("Failed to fetch air quality data");
     }
   } catch (error) {
-    toast.error("Error fetching air quality data");
+    toast.error("Couldn't get air quality data for this location");
     throw error;
   }
 };
@@ -44,38 +44,38 @@ export const getAQICategory = (aqi: number): {
   if (aqi <= 50) {
     return {
       label: "Good",
-      color: "bg-aqi-good",
-      description: "Air quality is satisfactory, and air pollution poses little or no risk.",
+      color: "bg-green-500",
+      description: "Perfect for outdoor activities! 🌳",
     };
   } else if (aqi <= 100) {
     return {
       label: "Moderate",
-      color: "bg-aqi-moderate",
-      description: "Air quality is acceptable. However, there may be a risk for some people.",
+      color: "bg-yellow-500",
+      description: "OK for most people to be outside 👌",
     };
   } else if (aqi <= 150) {
     return {
       label: "Unhealthy for Sensitive Groups",
-      color: "bg-aqi-unhealthy",
-      description: "Members of sensitive groups may experience health effects.",
+      color: "bg-orange-500",
+      description: "Take it easy if you're sensitive to air quality 🤔",
     };
   } else if (aqi <= 200) {
     return {
       label: "Unhealthy",
-      color: "bg-aqi-unhealthy",
-      description: "Everyone may begin to experience health effects.",
+      color: "bg-red-500",
+      description: "Maybe stay inside if you can 😷",
     };
   } else if (aqi <= 300) {
     return {
       label: "Very Unhealthy",
-      color: "bg-aqi-veryUnhealthy",
-      description: "Health warnings of emergency conditions.",
+      color: "bg-purple-500",
+      description: "Best to stay indoors today! ⚠️",
     };
   } else {
     return {
       label: "Hazardous",
-      color: "bg-aqi-hazardous",
-      description: "Health alert: everyone may experience serious health effects.",
+      color: "bg-red-900",
+      description: "Definitely stay inside! 🏠",
     };
   }
 };
