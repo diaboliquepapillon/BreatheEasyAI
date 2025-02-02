@@ -14,7 +14,9 @@ const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("opencage_api_key") || "");
+  const [waqiApiKey, setWaqiApiKey] = useState(() => localStorage.getItem("waqi_api_key") || "");
   const [showApiInput, setShowApiInput] = useState(!localStorage.getItem("opencage_api_key"));
+  const [showWaqiApiInput, setShowWaqiApiInput] = useState(!localStorage.getItem("waqi_api_key"));
 
   const handleApiKeySave = () => {
     if (!apiKey.trim()) {
@@ -35,7 +37,7 @@ const Index = () => {
       .then(() => {
         localStorage.setItem("opencage_api_key", apiKey);
         setShowApiInput(false);
-        toast.success("API key saved successfully! 🚀");
+        toast.success("OpenCage API key saved successfully! 🚀");
       })
       .catch((error) => {
         toast.error(error.message || "Invalid API key. Please check and try again.");
@@ -43,10 +45,38 @@ const Index = () => {
       });
   };
 
+  const handleWaqiApiKeySave = () => {
+    if (!waqiApiKey.trim()) {
+      toast.error("Please enter a valid WAQI API key");
+      return;
+    }
+
+    fetch(`https://api.waqi.info/feed/here/?token=${waqiApiKey}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === "error") {
+          throw new Error("Invalid WAQI API key");
+        }
+        localStorage.setItem("waqi_api_key", waqiApiKey);
+        setShowWaqiApiInput(false);
+        toast.success("WAQI API key saved successfully! 🌍");
+      })
+      .catch((error) => {
+        toast.error(error.message || "Invalid WAQI API key. Please check and try again.");
+        localStorage.removeItem("waqi_api_key");
+      });
+  };
+
   const handleLocationSearch = async () => {
     if (!apiKey) {
       toast.error("Please enter your OpenCage API key first");
       setShowApiInput(true);
+      return;
+    }
+
+    if (!waqiApiKey) {
+      toast.error("Please enter your WAQI API key first");
+      setShowWaqiApiInput(true);
       return;
     }
 
@@ -65,7 +95,7 @@ const Index = () => {
       const data = await response.json();
       
       if (data.status?.code === 401 || data.status?.code === 403) {
-        toast.error("Invalid API key. Please check and try again.");
+        toast.error("Invalid OpenCage API key. Please check and try again.");
         setShowApiInput(true);
         localStorage.removeItem("opencage_api_key");
         return;
@@ -113,38 +143,74 @@ const Index = () => {
             Hello there! 👋 Would you like to know how clean the air is in your area? Simply type in your location below and we shall find out! 🌍✨
           </p>
         
-          {showApiInput && (
+          {(showApiInput || showWaqiApiInput) && (
             <div className="max-w-md mx-auto space-y-4 p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border-2 border-green-100 animate-fade-in">
               <div className="flex items-center justify-center gap-2 text-green-600">
                 <Rocket className="w-6 h-6" />
                 <h2 className="text-xl font-semibold">Get Started!</h2>
               </div>
-              <p className="text-sm text-green-700">
-                To utilise this application, you'll need a free OpenCage API key. Obtain one at{" "}
-                <a 
-                  href="https://opencagedata.com/users/sign_up" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  opencagedata.com
-                </a>
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  type="password"
-                  placeholder="Enter your OpenCage API key"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="border-green-200 focus:ring-green-500"
-                />
-                <Button 
-                  onClick={handleApiKeySave}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Save Key
-                </Button>
-              </div>
+              
+              {showApiInput && (
+                <>
+                  <p className="text-sm text-green-700">
+                    To utilise this application, you'll need a free OpenCage API key. Obtain one at{" "}
+                    <a 
+                      href="https://opencagedata.com/users/sign_up" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      opencagedata.com
+                    </a>
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      type="password"
+                      placeholder="Enter your OpenCage API key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="border-green-200 focus:ring-green-500"
+                    />
+                    <Button 
+                      onClick={handleApiKeySave}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Save Key
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {showWaqiApiInput && (
+                <>
+                  <p className="text-sm text-green-700 mt-4">
+                    You'll also need a free World Air Quality Index (WAQI) API key. Get one at{" "}
+                    <a 
+                      href="https://aqicn.org/data-platform/token/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      aqicn.org
+                    </a>
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      type="password"
+                      placeholder="Enter your WAQI API key"
+                      value={waqiApiKey}
+                      onChange={(e) => setWaqiApiKey(e.target.value)}
+                      className="border-green-200 focus:ring-green-500"
+                    />
+                    <Button 
+                      onClick={handleWaqiApiKeySave}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Save Key
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           )}
           

@@ -11,11 +11,25 @@ export interface AirQualityData {
 }
 
 export const getAirQuality = async (lat: number, lon: number): Promise<AirQualityData> => {
+  const token = localStorage.getItem("waqi_api_key");
+  
+  if (!token) {
+    throw new Error("Please enter your WAQI API token first");
+  }
+
   try {
     const response = await fetch(
-      `https://api.waqi.info/feed/geo:${lat};${lon}/?token=demo`
+      `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${token}`
     );
     const data = await response.json();
+
+    if (data.status === "error") {
+      if (data.data === "Invalid key") {
+        localStorage.removeItem("waqi_api_key");
+        throw new Error("Invalid API key. Please check and try again.");
+      }
+      throw new Error(data.data);
+    }
 
     if (data.status === "ok") {
       const timestamp = data.data.time.iso || new Date().toISOString();
@@ -33,7 +47,11 @@ export const getAirQuality = async (lat: number, lon: number): Promise<AirQualit
       throw new Error(data.data || "Failed to fetch air quality data");
     }
   } catch (error) {
-    toast.error("Couldn't get air quality data for this location");
+    if (error instanceof Error) {
+      toast.error(error.message);
+    } else {
+      toast.error("Couldn't get air quality data for this location");
+    }
     throw error;
   }
 };
