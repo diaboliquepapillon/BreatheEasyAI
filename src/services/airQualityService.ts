@@ -1,5 +1,8 @@
 import { toast } from "sonner";
 
+// TODO: Replace with your WAQI API key
+const WAQI_API_KEY = "PLACE_YOUR_WAQI_API_KEY_HERE";
+
 export interface AirQualityData {
   aqi: number;
   pm25: number;
@@ -10,25 +13,14 @@ export interface AirQualityData {
   timestamp: string;
 }
 
-
 export const getAirQuality = async (lat: number, lon: number): Promise<AirQualityData> => {
-  const token = localStorage.getItem('313bdd8f80305b7662663ab22e1c1d8c3e2b4871');
-  
-  if (!token) {
-    throw new Error("Please enter your WAQI API token first");
-  }
-
   try {
     const response = await fetch(
-      `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${token}`
+      `https://api.waqi.info/feed/geo:${lat};${lon}/?token=${WAQI_API_KEY}`
     );
     const data = await response.json();
 
     if (data.status === "error") {
-      if (data.data === "Invalid key") {
-        localStorage.removeItem("waqi_api_key");
-        throw new Error("Invalid API key. Please check and try again.");
-      }
       throw new Error(data.data);
     }
 

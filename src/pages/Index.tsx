@@ -10,6 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
+// TODO: Replace with your OpenCage API key
+const OPENCAGE_API_KEY = "PLACE_YOUR_OPENCAGE_API_KEY_HERE";
+
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [location, setLocation] = useState<{ lat: number; lon: number } | null>(null);
@@ -24,7 +27,7 @@ const Index = () => {
       const response = await fetch(
         `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
           searchLocation
-        )}&key=YOUR_OPENCAGE_API_KEY`
+        )}&key=${OPENCAGE_API_KEY}`
       );
       
       const data = await response.json();
