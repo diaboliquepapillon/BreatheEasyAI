@@ -9,7 +9,7 @@ interface AQIDisplayProps {
 }
 
 export const AQIDisplay = ({ data }: AQIDisplayProps) => {
-  const { label, color, description } = getAQICategory(data.aqi);
+  const { label, color, description, recommendation } = getAQICategory(data.aqi);
   const formattedDate = format(new Date(data.timestamp), "PPpp");
 
   const getEmoji = (aqi: number) => {
@@ -50,6 +50,11 @@ export const AQIDisplay = ({ data }: AQIDisplayProps) => {
             <span>Moderate 😐</span>
             <span>Bad 😷</span>
           </div>
+        </div>
+
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <h4 className="font-semibold mb-2">Health Advisory</h4>
+          <p className="text-gray-700">{recommendation}</p>
         </div>
       </div>
     </Card>

@@ -8,7 +8,7 @@ import { getAirQuality } from "@/services/airQualityService";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Rocket, Globe, Wind } from "lucide-react";
+import { Rocket, Globe, Wind, Search } from "lucide-react";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
@@ -74,7 +74,7 @@ const Index = () => {
       if (data.results && data.results.length > 0) {
         const { lat, lng: lon } = data.results[0].geometry;
         setLocation({ lat, lon });
-        toast.success("Location found! Checking air quality... 🌍");
+        toast.success(`Checking air quality in ${data.results[0].formatted}... 🌍`);
       } else {
         toast.error("Location not found. Please try again with a different search term.");
       }
@@ -90,8 +90,16 @@ const Index = () => {
     enabled: !!location,
   });
 
+  const getBackgroundColor = (aqi?: number) => {
+    if (!aqi) return "from-[#F2FCE2]";
+    if (aqi <= 50) return "from-blue-100";
+    if (aqi <= 100) return "from-yellow-100";
+    if (aqi <= 150) return "from-orange-100";
+    return "from-red-100";
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F2FCE2] to-white">
+    <div className={`min-h-screen bg-gradient-to-b ${getBackgroundColor(data?.aqi)} to-white transition-colors duration-500`}>
       <div className="container py-8 space-y-8">
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -105,85 +113,111 @@ const Index = () => {
             Hey there! 👋 Want to know how clean the air is in your area? Just type in your location below and let's find out! 🌍✨
           </p>
         
-        {showApiInput && (
-          <div className="max-w-md mx-auto space-y-4 p-6 bg-white rounded-xl shadow-lg border-2 border-green-100 animate-fade-in">
-            <div className="flex items-center justify-center gap-2 text-green-600">
-              <Rocket className="w-6 h-6" />
-              <h2 className="text-xl font-semibold">Get Started!</h2>
+          {showApiInput && (
+            <div className="max-w-md mx-auto space-y-4 p-6 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border-2 border-green-100 animate-fade-in">
+              <div className="flex items-center justify-center gap-2 text-green-600">
+                <Rocket className="w-6 h-6" />
+                <h2 className="text-xl font-semibold">Get Started!</h2>
+              </div>
+              <p className="text-sm text-green-700">
+                To use this app, you'll need a free OpenCage API key. Get one at{" "}
+                <a 
+                  href="https://opencagedata.com/users/sign_up" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  opencagedata.com
+                </a>
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  type="password"
+                  placeholder="Enter your OpenCage API key"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="border-green-200 focus:ring-green-500"
+                />
+                <Button 
+                  onClick={handleApiKeySave}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Save Key
+                </Button>
+              </div>
             </div>
-            <p className="text-sm text-green-700">
-              To use this app, you'll need a free OpenCage API key. Get one at{" "}
-              <a 
-                href="https://opencagedata.com/users/sign_up" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                opencagedata.com
-              </a>
-            </p>
-            <div className="flex gap-2">
+          )}
+          
+          <div className="flex gap-2 max-w-md mx-auto">
+            <div className="relative flex-1">
               <Input
-                type="password"
-                placeholder="Enter your OpenCage API key"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="border-green-200 focus:ring-green-500"
+                placeholder="Type any location (e.g., Tokyo, New York, Paris)"
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
+                className="pl-10 border-green-200 focus:ring-green-500"
               />
-              <Button 
-                onClick={handleApiKeySave}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Save Key
-              </Button>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            </div>
+            <Button 
+              onClick={handleLocationSearch}
+              className="bg-green-600 hover:bg-green-700 transition-all hover:scale-105"
+            >
+              Check Air
+            </Button>
+          </div>
+        </div>
+
+        {isLoading && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+            <p className="mt-4 text-green-700">Loading your results... 🌿</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-8">
+            <p className="text-xl text-red-500">Oops! Something went wrong 😅</p>
+            <p className="mt-2 text-green-700">Try searching for a different location!</p>
+          </div>
+        )}
+
+        {data && location && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+            <div className="space-y-6">
+              <AQIDisplay data={data} />
+              <PollutantsDisplay data={data} />
+            </div>
+            <div className="space-y-6">
+              <AQIMap data={data} location={location} />
+              <TrendChart data={[data]} />
             </div>
           </div>
         )}
-        
-        <div className="flex gap-2 max-w-md mx-auto">
-          <Input
-            placeholder="Type any location (e.g., Tokyo, New York, Paris)"
-            value={searchLocation}
-            onChange={(e) => setSearchLocation(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleLocationSearch()}
-            className="border-green-200 focus:ring-green-500"
-          />
-          <Button 
-            onClick={handleLocationSearch}
-            className="bg-green-600 hover:bg-green-700 transition-all hover:scale-105"
+
+        {data && (
+          <Button
+            onClick={() => {
+              const text = `Air Quality in ${searchLocation}: ${data.aqi} AQI - Check it out on AirCheck Pro!`;
+              if (navigator.share) {
+                navigator.share({
+                  title: 'AirCheck Pro - Air Quality Update',
+                  text: text,
+                  url: window.location.href,
+                }).catch(console.error);
+              } else {
+                navigator.clipboard.writeText(text).then(() => {
+                  toast.success('Air quality info copied to clipboard! 📋');
+                });
+              }
+            }}
+            className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 rounded-full shadow-lg px-6 py-3 flex items-center gap-2"
           >
-            Check Air
+            <Globe className="w-5 h-5" />
+            Share AQI
           </Button>
-        </div>
+        )}
       </div>
-
-      {isLoading && (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-green-700">Loading your results... 🌿</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="text-center py-8">
-          <p className="text-xl text-red-500">Oops! Something went wrong 😅</p>
-          <p className="mt-2 text-green-700">Try searching for a different location!</p>
-        </div>
-      )}
-
-      {data && location && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
-          <div className="space-y-6">
-            <AQIDisplay data={data} />
-            <PollutantsDisplay data={data} />
-          </div>
-          <div className="space-y-6">
-            <AQIMap data={data} location={location} />
-            <TrendChart data={[data]} />
-          </div>
-        </div>
-      )}
-    </div>
     </div>
   );
 };
