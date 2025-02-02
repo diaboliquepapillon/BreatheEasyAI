@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 // TODO: Replace with your WAQI API key
-const WAQI_API_KEY = "PLACE_YOUR_WAQI_API_KEY_HERE";
+const WAQI_API_KEY = "313bdd8f80305b7662663ab22e1c1d8c3e2b4871";
 
 export interface AirQualityData {
   aqi: number;

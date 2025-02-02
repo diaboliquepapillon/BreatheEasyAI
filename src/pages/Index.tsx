@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 // TODO: Replace with your OpenCage API key
-const OPENCAGE_API_KEY = "PLACE_YOUR_OPENCAGE_API_KEY_HERE";
+const OPENCAGE_API_KEY = "709b395c9ae54afe835f5a037f84967b";
 
 const Index = () => {
   const [searchLocation, setSearchLocation] = useState("");
